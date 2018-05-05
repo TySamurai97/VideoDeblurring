@@ -6,6 +6,16 @@ from tqdm import tqdm
 import cv2
 
 
+l = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+
+st = []
+
+def genrateNames():
+    for i in l:
+        for j in l:
+            for k in l:
+                st.append( i + j + k )
+
 # normalization x to [-1,1]
 def normalization(x):
     return x / 127.5 - 1
@@ -81,14 +91,30 @@ def generate_image(full, blur, generated, path, epoch=None, index=None):
         image_generated = generated[i, :, :, :]
         image = np.concatenate((image_full, image_blur, image_generated), axis=1)
         if (epoch is not None) and (index is not None):
-            cv2.imwrite(path + str(epoch + 1) + '_' + str(index + 1) + '.png',image)
+            cv2.imwrite(path + str(epoch + 1) + '_' + str(index + 1) + '.jpg',image)
         else:
-            cv2.imwrite(path + str(i) + '.png',image)
+            cv2.imwrite(path + str(i) + '.jpg',image)
 
+def generate_single_image(full, blur, generated, path, epoch=None, index=None):
+    genrateNames()
+    cnt = 0
+    full = full * 127.5 + 127.5
+    blur = blur * 127.5 + 127.5
+    generated = generated * 127.5 + 127.5
+    for i in range(generated.shape[0]):
+        image_full = full[i, :, :, :]
+        image_blur = blur[i, :, :, :]
+        image_generated = generated[i, :, :, :]
+        image = image_generated
+        if (epoch is not None) and (index is not None):
+            cv2.imwrite(path + st[cnt] + '.jpg',image)
+        else:
+            cv2.imwrite(path + st[cnt] + '.jpg',image)
+        cnt += 1
 
 if __name__ == '__main__':
     # format_image('data/small/test/301.jpg', size=256)
     build_hdf5('data/small')
-    img_full, img_blur = load_data('train')
-    print(img_full, '\n', len(img_blur))
+    # img_full, img_blur = load_data('train')
+    # print(img_full, '\n', len(img_blur))
     # load_data(data_type = 'test')
